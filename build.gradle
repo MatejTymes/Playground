@@ -9,6 +9,8 @@ repositories {
 dependencies {
 
     compile 'com.github.matejtymes:javafixes:1.2.0'
+    compile 'com.google.guava:guava:25.1-jre'
+
 
 //    testCompile 'junit:junit:4.12'
     testCompile 'org.junit.jupiter:junit-jupiter-engine:5.2.0'
