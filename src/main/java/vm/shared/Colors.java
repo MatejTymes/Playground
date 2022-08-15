@@ -1,4 +1,4 @@
-package vm.shred;
+package vm.shared;
 
 import java.awt.*;
 

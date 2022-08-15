@@ -1,6 +1,6 @@
 package vm.teacher;
 
-import vm.shred.Colors;
+import vm.shared.Colors;
 
 import javax.swing.*;
 import java.awt.*;
