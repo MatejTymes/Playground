@@ -1,19 +1,21 @@
 package reboot;
 
+import java.io.InputStream;
 import java.net.URL;
 import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class RebootUtil {
+import static java.lang.Math.max;
 
+public class RebootUtil {
 
 
     public static Map<String, ZonedDateTime> readRebootTimes(URL fileURL) {
         Map<String, ZonedDateTime> rebootTimes = new TreeMap<>();
 
-        try {
-            String content = new String(fileURL.openStream().readAllBytes());
+        try (InputStream inputStream = fileURL.openStream()) {
+            String content = new String(inputStream.readAllBytes());
             for (String line : content.split("\n")) {
                 if (!line.contains("|")) {
                     continue;
@@ -39,7 +41,7 @@ public class RebootUtil {
                 });
             }
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to read reboot timings", e);
         }
 
         return rebootTimes;
@@ -50,8 +52,23 @@ public class RebootUtil {
         try {
             timingsUrl = new URL("https://raw.githubusercontent.com/MatejTymes/Playground/master/src/main/rebootAt.txt");
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to parse timings URL", e);
         }
         return readRebootTimes(timingsUrl);
+    }
+
+    public static void triggerRebootAt(ZonedDateTime rebootAt) {
+        ZonedDateTime now = ZonedDateTime.now();
+
+        long rebootInSeconds = max(
+                0L,
+                (rebootAt.toInstant().toEpochMilli() - now.toInstant().toEpochMilli()) / 1_000
+        );
+
+        try {
+            Runtime.getRuntime().exec("shutdown -r -t " + rebootInSeconds);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to execute shutdown", e);
+        }
     }
 }
