@@ -8,12 +8,15 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static java.util.concurrent.Executors.newScheduledThreadPool;
-import static reboot.RebootUtil.readRebootTimes;
-import static reboot.RebootUtil.triggerRebootAt;
+import static reboot.RebootUtil.*;
 
 public class Rebooter {
 
     public static void main(String[] args) {
+        useSystemProxies();
+        addGenericSSLCertificate();
+
+
         ScheduledExecutorService pool = newScheduledThreadPool(1);
 
         Runnable action = () -> {
