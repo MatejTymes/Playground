@@ -1,18 +1,57 @@
 package reboot;
 
-import java.io.InputStream;
+import java.io.*;
+import java.net.InetAddress;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.time.ZonedDateTime;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.Objects;
 
 import static java.lang.Math.max;
 
 public class RebootUtil {
 
+    public static final String SRC_MAIN_REBOOT_AT_TXT = "src/main/rebootAt.txt";
 
-    public static Map<String, ZonedDateTime> readRebootTimes(URL fileURL) {
-        Map<String, ZonedDateTime> rebootTimes = new TreeMap<>();
+
+    public static class HostName {
+        public final String value;
+
+        public HostName(String value) {
+            this.value = value.split("\\.")[0].toLowerCase();
+        }
+
+        public static HostName localHostName() {
+            try {
+                return new HostName(InetAddress.getLocalHost().getHostName());
+            } catch (UnknownHostException e) {
+                throw new RuntimeException("Unable to resolve local host name", e);
+            }
+        }
+
+        @Override
+        public String toString() {
+            return value;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            HostName hostName = (HostName) o;
+            return Objects.equals(value, hostName.value);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(value);
+        }
+    }
+
+    public static Map<HostName, ZonedDateTime> readRebootTimes(URL fileURL) {
+        Map<HostName, ZonedDateTime> rebootTimes = new LinkedHashMap<>();
 
         try (InputStream inputStream = fileURL.openStream()) {
             String content = new String(inputStream.readAllBytes());
@@ -22,7 +61,7 @@ public class RebootUtil {
                 }
 
                 String[] parts = line.split("\\|");
-                String hostname = parts[0].toLowerCase();
+                HostName hostname = new HostName(parts[0]);
                 ZonedDateTime rebootTime = ZonedDateTime.parse(parts[1]);
 
                 rebootTimes.merge(hostname, rebootTime, (oldTime, newTime) -> {
@@ -47,14 +86,28 @@ public class RebootUtil {
         return rebootTimes;
     }
 
-    public static Map<String, ZonedDateTime> readRebootTimes() {
+    public static Map<HostName, ZonedDateTime> readRebootTimes() {
         URL timingsUrl;
         try {
-            timingsUrl = new URL("https://raw.githubusercontent.com/MatejTymes/Playground/master/src/main/rebootAt.txt");
+            timingsUrl = new URL("https://raw.githubusercontent.com/MatejTymes/Playground/master/" + SRC_MAIN_REBOOT_AT_TXT);
         } catch (Exception e) {
             throw new RuntimeException("Failed to parse timings URL", e);
         }
         return readRebootTimes(timingsUrl);
+    }
+
+    public static void writeRebootTimes(Map<HostName, ZonedDateTime> rebootTimes) throws IOException {
+        File file = new File(SRC_MAIN_REBOOT_AT_TXT);
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            for (Map.Entry<HostName, ZonedDateTime> entry : rebootTimes.entrySet()) {
+                HostName hostName = entry.getKey();
+                ZonedDateTime rebootTime = entry.getValue();
+
+                writer.write(hostName.value + "|" + rebootTime + "\n");
+            }
+            writer.flush();
+        }
     }
 
     public static void triggerRebootAt(ZonedDateTime rebootAt) {

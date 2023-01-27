@@ -1,6 +1,7 @@
 package reboot;
 
-import java.net.InetAddress;
+import reboot.RebootUtil.HostName;
+
 import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
@@ -12,35 +13,32 @@ import static reboot.RebootUtil.triggerRebootAt;
 
 public class Rebooter {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         ScheduledExecutorService pool = newScheduledThreadPool(1);
 
-        pool.scheduleAtFixedRate(
-                () -> {
-                    try {
-                        Map<String, ZonedDateTime> rebootTimes = readRebootTimes();
+        Runnable action = () -> {
+            try {
+                Map<HostName, ZonedDateTime> rebootTimes = readRebootTimes();
 
-                        System.out.println(ZonedDateTime.now() + ": " + rebootTimes);
+                System.out.println(ZonedDateTime.now() + ": " + rebootTimes);
 
-                        String actualHostname = InetAddress.getLocalHost().getHostName().split("\\.")[0].toLowerCase();
-                        for (Map.Entry<String, ZonedDateTime> entry : rebootTimes.entrySet()) {
-                            String hostName = entry.getKey();
-                            ZonedDateTime rebootTime = entry.getValue();
+                HostName actualHostname = HostName.localHostName();
+                for (Map.Entry<HostName, ZonedDateTime> entry : rebootTimes.entrySet()) {
+                    HostName hostName = entry.getKey();
+                    ZonedDateTime rebootTime = entry.getValue();
 
-                            if (actualHostname.equalsIgnoreCase(hostName)) {
-                                ZonedDateTime now = ZonedDateTime.now();
-                                if (rebootTime.isAfter(now)) {
-                                    triggerRebootAt(rebootTime);
-                                }
-                            }
+                    if (actualHostname.equals(hostName)) {
+                        ZonedDateTime now = ZonedDateTime.now();
+                        if (rebootTime.isAfter(now)) {
+                            triggerRebootAt(rebootTime);
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
                     }
-                },
-                0,
-                5,
-                TimeUnit.MINUTES
-        );
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        };
+
+        pool.scheduleAtFixedRate(action, 0, 5, TimeUnit.MINUTES);
     }
 }
