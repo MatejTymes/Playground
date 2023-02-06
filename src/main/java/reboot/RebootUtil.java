@@ -86,16 +86,6 @@ public class RebootUtil {
             // Install the all-trusting host verifier
             HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
 
-            URL url = new URL("https://www.nakov.com:2083/");
-            URLConnection con = url.openConnection();
-            Reader reader = new InputStreamReader(con.getInputStream());
-            while (true) {
-                int ch = reader.read();
-                if (ch==-1) {
-                    break;
-                }
-                System.out.print((char)ch);
-            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
