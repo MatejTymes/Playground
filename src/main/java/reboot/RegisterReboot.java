@@ -18,7 +18,7 @@ public class RegisterReboot {
 
         Map<HostName, ZonedDateTime> rebootTimes = readRebootTimes();
 
-        ZonedDateTime rebootIn = ZonedDateTime.now().plusMinutes(7).withZoneSameInstant(ZoneId.of("UTC"));
+        ZonedDateTime rebootIn = ZonedDateTime.now().plusMinutes(17).withZoneSameInstant(ZoneId.of("UTC"));
         rebootTimes.put(machineName, rebootIn);
 
         writeRebootTimes(rebootTimes);
