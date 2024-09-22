@@ -111,37 +111,85 @@ def draw3dGraph(f3d,xRange,yRange,zRange,drawSteps):
             yVal=yVals[yInd]
             zVals[xInd][yInd]=f3d(xVal,yVal)
 
-    # draw the values
-    for indA in range(steps+2):
-        xVal=xVals[indA]
-        px=wXDist*(xVal-xMin)/xDist+wXA
-        for yInd in range(steps+1):
-            yVal1=yVals[yInd]
-            yVal2=yVals[yInd+1]
-            zVal1=zVals[indA][yInd]
-            zVal2=zVals[indA][yInd+1]
+    # draw the values - new approach
+    for ind in range(steps+1):
+        xInd,yInd=0,ind
+        while yInd>=0:
+            xValA,xValB=xVals[xInd],xVals[xInd+1]
+            yValA,yValB=yVals[yInd],yVals[yInd+1]
+            zValAA=zVals[xInd][yInd]
+            zValAB=zVals[xInd][yInd+1]
+            zValBA=zVals[xInd+1][yInd]
 
-            py1=wYDist*(yVal1-yMin)/yDist+wYA
-            py2=wYDist*(yVal2-yMin)/yDist+wYA
-            pz1=wZDist*(zVal1-zMin)/zDist+wZA
-            pz2=wZDist*(zVal2-zMin)/zDist+wZA
+            pxA=wXDist*(xValA-xMin)/xDist+wXA
+            pxB=wXDist*(xValB-xMin)/xDist+wXA
+            pyA=wYDist*(yValA-yMin)/yDist+wYA
+            pyB=wYDist*(yValB-yMin)/yDist+wYA
+            pzAA=wZDist*(zValAA-zMin)/zDist+wZA
+            pzAB=wZDist*(zValAB-zMin)/zDist+wZA
+            pzBA=wZDist*(zValBA-zMin)/zDist+wZA
 
-            line_3d(px,py1,pz1,px,py2,pz2,(0,180,0))
+            line_3d(pxA,pyA,pzAA,pxA,pyB,pzAB,(0,180,0))
+            line_3d(pxA,pyA,pzAA,pxB,pyA,pzBA,(0,0,180))
 
-        yVal=yVals[indA]
-        py=wYDist*(yVal-yMin)/yDist+wYA
-        for xInd in range(steps+1):
-            xVal1=xVals[xInd]
-            xVal2=xVals[xInd+1]
-            zVal1=zVals[xInd][indA]
-            zVal2=zVals[xInd+1][indA]
+            xInd+=1
+            yInd-=1
 
-            px1=wXDist*(xVal1-xMin)/xDist+wXA
-            px2=wXDist*(xVal2-xMin)/xDist+wXA
-            pz1=wZDist*(zVal1-zMin)/zDist+wZA
-            pz2=wZDist*(zVal2-zMin)/zDist+wZA
+    for ind in range(steps+1):
+        xInd,yInd=1+ind,steps+1
+        while xInd<=steps+1:
+            xValA,xValB=xVals[xInd-1],xVals[xInd]
+            yValA,yValB=yVals[yInd-1],yVals[yInd]
+            zValAB=zVals[xInd-1][yInd]
+            zValBA=zVals[xInd][yInd-1]
+            zValBB=zVals[xInd][yInd]
 
-            line_3d(px1,py,pz1,px2,py,pz2,(0,0,180))
+            pxA=wXDist*(xValA-xMin)/xDist+wXA
+            pxB=wXDist*(xValB-xMin)/xDist+wXA
+            pyA=wYDist*(yValA-yMin)/yDist+wYA
+            pyB=wYDist*(yValB-yMin)/yDist+wYA
+            pzAB=wZDist*(zValAB-zMin)/zDist+wZA
+            pzBA=wZDist*(zValBA-zMin)/zDist+wZA
+            pzBB=wZDist*(zValBB-zMin)/zDist+wZA
+
+            line_3d(pxB,pyA,pzBA,pxB,pyB,pzBB,(0,180,0))
+            line_3d(pxA,pyB,pzAB,pxB,pyB,pzBB,(0,0,180))
+
+            xInd+=1
+            yInd-=1
+
+
+    # draw the values - old approach
+    # for indA in range(steps+2):
+    #     xVal=xVals[indA]
+    #     px=wXDist*(xVal-xMin)/xDist+wXA
+    #     for yInd in range(steps+1):
+    #         yVal1=yVals[yInd]
+    #         yVal2=yVals[yInd+1]
+    #         zVal1=zVals[indA][yInd]
+    #         zVal2=zVals[indA][yInd+1]
+    #
+    #         py1=wYDist*(yVal1-yMin)/yDist+wYA
+    #         py2=wYDist*(yVal2-yMin)/yDist+wYA
+    #         pz1=wZDist*(zVal1-zMin)/zDist+wZA
+    #         pz2=wZDist*(zVal2-zMin)/zDist+wZA
+    #
+    #         line_3d(px,py1,pz1,px,py2,pz2,(0,180,0))
+    #
+    #     yVal=yVals[indA]
+    #     py=wYDist*(yVal-yMin)/yDist+wYA
+    #     for xInd in range(steps+1):
+    #         xVal1=xVals[xInd]
+    #         xVal2=xVals[xInd+1]
+    #         zVal1=zVals[xInd][indA]
+    #         zVal2=zVals[xInd+1][indA]
+    #
+    #         px1=wXDist*(xVal1-xMin)/xDist+wXA
+    #         px2=wXDist*(xVal2-xMin)/xDist+wXA
+    #         pz1=wZDist*(zVal1-zMin)/zDist+wZA
+    #         pz2=wZDist*(zVal2-zMin)/zDist+wZA
+    #
+    #         line_3d(px1,py,pz1,px2,py,pz2,(0,0,180))
 
     # grid - front side
     for wz in (wZA,wZB):
