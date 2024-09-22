@@ -80,16 +80,14 @@ def draw3dGraph(f3d,xRange,yRange,zRange,drawSteps):
     yMin,yMax=yRange[0],yRange[1]
     zMin,zMax=zRange[0],zRange[1]
 
-    fill_rect(0,0,320,220,(240,255,220))
+    bgC=(240,255,220)
+    fill_rect(0,0,320,220,bgC)
 
     # grid - back side
     for wz in (wZA,wZB):
-        # line_3d(wXA-wXOvfl,wYA,wz,wXB+wXOvfl,wYA,wz,(100,100,100))
-        # line_3d(wXA,wYA-wYOvfl,wz,wXA,wYB+wYOvfl,wz,(100,100,100))
         line_3d_opaq(wXA-wXOvfl,wYA,wz,wXB+wXOvfl,wYA,wz,wOpac,(0,0,0))
         line_3d_opaq(wXA,wYA-wYOvfl,wz,wXA,wYB+wYOvfl,wz,wOpac,(0,0,0))
     for (wx,wy) in [(wXA,wYA),(wXA,wYB),(wXB,wYA)]:
-        # line_3d(wx,wy,wZA-wZOvfl,wx,wy,wZB+wZOvfl,(100,100,100))
         line_3d_opaq(wx,wy,wZA-wZOvfl,wx,wy,wZB+wZOvfl,wOpac,(0,0,0))
 
     # wireframe
@@ -100,8 +98,7 @@ def draw3dGraph(f3d,xRange,yRange,zRange,drawSteps):
     # calculate the values
     xVals=[0]*(steps+2)
     yVals=[0]*(steps+2)
-    # zVals=[[0]*(steps+2)]*(steps+2)
-    zVals=[[0]*(steps+2) for p in range(steps+2)]
+    zVals=[[0]*(steps+2) for k in range(steps+2)]
     for s in range(steps+2):
         xVals[s]=s*xDist/(steps+1)+xMin
         yVals[s]=s*yDist/(steps+1)+yMin
@@ -158,49 +155,18 @@ def draw3dGraph(f3d,xRange,yRange,zRange,drawSteps):
             xInd+=1
             yInd-=1
 
-
-    # draw the values - old approach
-    # for indA in range(steps+2):
-    #     xVal=xVals[indA]
-    #     px=wXDist*(xVal-xMin)/xDist+wXA
-    #     for yInd in range(steps+1):
-    #         yVal1=yVals[yInd]
-    #         yVal2=yVals[yInd+1]
-    #         zVal1=zVals[indA][yInd]
-    #         zVal2=zVals[indA][yInd+1]
-    #
-    #         py1=wYDist*(yVal1-yMin)/yDist+wYA
-    #         py2=wYDist*(yVal2-yMin)/yDist+wYA
-    #         pz1=wZDist*(zVal1-zMin)/zDist+wZA
-    #         pz2=wZDist*(zVal2-zMin)/zDist+wZA
-    #
-    #         line_3d(px,py1,pz1,px,py2,pz2,(0,180,0))
-    #
-    #     yVal=yVals[indA]
-    #     py=wYDist*(yVal-yMin)/yDist+wYA
-    #     for xInd in range(steps+1):
-    #         xVal1=xVals[xInd]
-    #         xVal2=xVals[xInd+1]
-    #         zVal1=zVals[xInd][indA]
-    #         zVal2=zVals[xInd+1][indA]
-    #
-    #         px1=wXDist*(xVal1-xMin)/xDist+wXA
-    #         px2=wXDist*(xVal2-xMin)/xDist+wXA
-    #         pz1=wZDist*(zVal1-zMin)/zDist+wZA
-    #         pz2=wZDist*(zVal2-zMin)/zDist+wZA
-    #
-    #         line_3d(px1,py,pz1,px2,py,pz2,(0,0,180))
-
     # grid - front side
     for wz in (wZA,wZB):
-        # line_3d(wXA-wXOvfl,wYB,wz,wXB+wXOvfl,wYB,wz,(100,100,100))
-        # line_3d(wXB,wYA-wYOvfl,wz,wXB,wYB+wYOvfl,wz,(100,100,100))
         line_3d_opaq(wXA-wXOvfl,wYB,wz,wXB+wXOvfl,wYB,wz,wOpac,(0,0,0))
         line_3d_opaq(wXB,wYA-wYOvfl,wz,wXB,wYB+wYOvfl,wz,wOpac,(0,0,0))
-    # line_3d(wXB,wYB,wZA-wZOvfl,wXB,wYB,wZB+wZOvfl,(100,100,100))
     line_3d_opaq(wXB,wYB,wZA-wZOvfl,wXB,wYB,wZB+wZOvfl,wOpac,(0,0,0))
 
+    # draw_string("x=0",260,160,(180,0,0),bgC)
+    # draw_string("y=0",260,180,(180,0,0),bgC)
+    # draw_string("z=3",260,200,(180,0,0),bgC)
 
+
+# todo: add tracing functionality
 draw3dGraph(
     # lambda x,y: sin(y-x)+cos(x)+cos(y),
     # (-3,3),(-3,3),(-3,3),15
@@ -211,3 +177,4 @@ draw3dGraph(
     lambda x,y: -5*sin(y-x)-10*cos(x),
     (-5,5),(-5,5),(-20,20),20
 )
+
