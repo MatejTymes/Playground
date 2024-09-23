@@ -1,5 +1,6 @@
 from kandinsky import *
 from math import sqrt,sin,cos,pi
+from ion import *
 # from time import sleep
 
 # center points
@@ -10,6 +11,7 @@ wXA,wXB,wXOvfl=-100,100,15
 wYA,wYB,wYOvfl=-100,100,15
 wZA,wZB,wZOvfl=-40,40,10
 wOpac=20
+bgC=(240,255,220)
 
 wXDist,wYDist,wZDist=wXB-wXA,wYB-wYA,wZB-wZA
 
@@ -75,12 +77,7 @@ def line_3d_opaq(x1,y1,z1,x2,y2,z2,opac,c):
     line_opaq(int(rx1),int(ry1),int(rx2),int(ry2),opac,c)
     # sleep(0.03)
 
-def draw3dGraph(f3d,xRange,yRange,zRange,drawSteps):
-    xMin,xMax=xRange[0],xRange[1]
-    yMin,yMax=yRange[0],yRange[1]
-    zMin,zMax=zRange[0],zRange[1]
-
-    bgC=(240,255,220)
+def drawValues(steps,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist):
     fill_rect(0,0,320,220,bgC)
 
     # grid - back side
@@ -90,25 +87,7 @@ def draw3dGraph(f3d,xRange,yRange,zRange,drawSteps):
     for (wx,wy) in [(wXA,wYA),(wXA,wYB),(wXB,wYA)]:
         line_3d_opaq(wx,wy,wZA-wZOvfl,wx,wy,wZB+wZOvfl,wOpac,(0,0,0))
 
-    # wireframe
-
-    xDist,yDist,zDist=xMax-xMin,yMax-yMin,zMax-zMin
-    steps=drawSteps
-
-    # calculate the values
-    xVals=[0]*(steps+2)
-    yVals=[0]*(steps+2)
-    zVals=[[0]*(steps+2) for k in range(steps+2)]
-    for s in range(steps+2):
-        xVals[s]=s*xDist/(steps+1)+xMin
-        yVals[s]=s*yDist/(steps+1)+yMin
-    for xInd in range(steps+2):
-        xVal=xVals[xInd]
-        for yInd in range(steps+2):
-            yVal=yVals[yInd]
-            zVals[xInd][yInd]=f3d(xVal,yVal)
-
-    # draw the values - new approach
+    # draw wireframe - new approach
     for ind in range(steps+1):
         xInd,yInd=0,ind
         while yInd>=0:
@@ -162,7 +141,79 @@ def draw3dGraph(f3d,xRange,yRange,zRange,drawSteps):
     line_3d_opaq(wXB,wYB,wZA-wZOvfl,wXB,wYB,wZB+wZOvfl,wOpac,(0,0,0))
 
 
-# todo: add tracing functionality
+def draw3dGraph(f3d,xRange,yRange,zRange,steps):
+    xMin,xMax=xRange[0],xRange[1]
+    yMin,yMax=yRange[0],yRange[1]
+    zMin,zMax=zRange[0],zRange[1]
+
+    # calculate the values
+    xDist,yDist,zDist=xMax-xMin,yMax-yMin,zMax-zMin
+    xVals=[0]*(steps+2)
+    yVals=[0]*(steps+2)
+    zVals=[[0]*(steps+2) for k in range(steps+2)]
+    for s in range(steps+2):
+        xVals[s]=s*xDist/(steps+1)+xMin
+        yVals[s]=s*yDist/(steps+1)+yMin
+    for xInd in range(steps+2):
+        xVal=xVals[xInd]
+        for yInd in range(steps+2):
+            yVal=yVals[yInd]
+            zVals[xInd][yInd]=f3d(xVal,yVal)
+
+    drawValues(steps,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist)
+
+
+    xInd,yInd=int(len(xVals)/2),int(len(yVals)/2)
+
+    redraw=False
+    leftPressed,rightPressed,upPressed,downPressed=False,False,False,False
+    while True:
+        if redraw==True:
+            xVal,yVal,zVal=xVals[xInd],yVals[yInd],zVals[xInd][yInd]
+            # todo: do not draw again if we only want to display the text
+            drawValues(steps,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist)
+            draw_string("x="+str(xVal),0,0,(180,0,0),bgC)
+            draw_string("y="+str(yVal),0,20,(180,0,0),bgC)
+            draw_string("z="+str(zVal),0,200,(180,0,0),bgC)
+
+            px=wXDist*(xVal-xMin)/xDist+wXA
+            py=wYDist*(yVal-yMin)/yDist+wYA
+            pz=wZDist*(zVal-zMin)/zDist+wZA
+            line_3d_opaq(px,py,pz-5,px,py,pz+5,60,(255,0,0))
+            line_3d_opaq(px-5,py,pz,px+5,py,pz,60,(255,0,0))
+            line_3d_opaq(px,py-5,pz,px,py+5,pz,60,(255,0,0))
+
+            redraw=False
+        if keydown(KEY_LEFT):
+            if not leftPressed and xInd>0:
+                leftPressed=True
+                xInd-=1
+                redraw=True
+        else:
+            leftPressed=False
+        if keydown(KEY_RIGHT):
+            if not rightPressed and xInd+1<len(xVals):
+                rightPressed=True
+                xInd+=1
+                redraw=True
+        else:
+            rightPressed=False
+        if keydown(KEY_UP):
+            if not upPressed and yInd>0:
+                upPressed=True
+                yInd-=1
+                redraw=True
+        else:
+            upPressed=False
+        if keydown(KEY_DOWN):
+            if not downPressed and yInd+1<len(yVals):
+                downPressed=True
+                yInd+=1
+                redraw=True
+        else:
+            downPressed=False
+
+
 draw3dGraph(
     # lambda x,y: sin(y-x)+cos(x)+cos(y),
     # (-3,3),(-3,3),(-3,3),15
