@@ -10,8 +10,14 @@ cx,cy=320/2,220/2
 wXA,wXB,wXOvfl=-100,100,15
 wYA,wYB,wYOvfl=-100,100,15
 wZA,wZB,wZOvfl=-40,40,10
-wOpac=20
+
 bgC=(240,255,220)
+wOpac=20
+wC=(0,0,0)
+xlC,ylC=(0,0,180),(0,180,0)
+tOpac=60
+tC=(255,0,0)
+ttC=(180,0,0)
 
 wXDist,wYDist,wZDist=wXB-wXA,wYB-wYA,wZB-wZA
 
@@ -82,10 +88,10 @@ def drawValues(steps,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist):
 
     # grid - back side
     for wz in (wZA,wZB):
-        line_3d_opaq(wXA-wXOvfl,wYA,wz,wXB+wXOvfl,wYA,wz,wOpac,(0,0,0))
-        line_3d_opaq(wXA,wYA-wYOvfl,wz,wXA,wYB+wYOvfl,wz,wOpac,(0,0,0))
+        line_3d_opaq(wXA-wXOvfl,wYA,wz,wXB+wXOvfl,wYA,wz,wOpac,wC)
+        line_3d_opaq(wXA,wYA-wYOvfl,wz,wXA,wYB+wYOvfl,wz,wOpac,wC)
     for (wx,wy) in [(wXA,wYA),(wXA,wYB),(wXB,wYA)]:
-        line_3d_opaq(wx,wy,wZA-wZOvfl,wx,wy,wZB+wZOvfl,wOpac,(0,0,0))
+        line_3d_opaq(wx,wy,wZA-wZOvfl,wx,wy,wZB+wZOvfl,wOpac,wC)
 
     # draw wireframe - new approach
     for ind in range(steps+1):
@@ -105,8 +111,8 @@ def drawValues(steps,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist):
             pzAB=wZDist*(zValAB-zMin)/zDist+wZA
             pzBA=wZDist*(zValBA-zMin)/zDist+wZA
 
-            line_3d(pxA,pyA,pzAA,pxA,pyB,pzAB,(0,180,0))
-            line_3d(pxA,pyA,pzAA,pxB,pyA,pzBA,(0,0,180))
+            line_3d(pxA,pyA,pzAA,pxA,pyB,pzAB,ylC)
+            line_3d(pxA,pyA,pzAA,pxB,pyA,pzBA,xlC)
 
             xInd+=1
             yInd-=1
@@ -128,17 +134,17 @@ def drawValues(steps,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist):
             pzBA=wZDist*(zValBA-zMin)/zDist+wZA
             pzBB=wZDist*(zValBB-zMin)/zDist+wZA
 
-            line_3d(pxB,pyA,pzBA,pxB,pyB,pzBB,(0,180,0))
-            line_3d(pxA,pyB,pzAB,pxB,pyB,pzBB,(0,0,180))
+            line_3d(pxB,pyA,pzBA,pxB,pyB,pzBB,ylC)
+            line_3d(pxA,pyB,pzAB,pxB,pyB,pzBB,xlC)
 
             xInd+=1
             yInd-=1
 
     # grid - front side
     for wz in (wZA,wZB):
-        line_3d_opaq(wXA-wXOvfl,wYB,wz,wXB+wXOvfl,wYB,wz,wOpac,(0,0,0))
-        line_3d_opaq(wXB,wYA-wYOvfl,wz,wXB,wYB+wYOvfl,wz,wOpac,(0,0,0))
-    line_3d_opaq(wXB,wYB,wZA-wZOvfl,wXB,wYB,wZB+wZOvfl,wOpac,(0,0,0))
+        line_3d_opaq(wXA-wXOvfl,wYB,wz,wXB+wXOvfl,wYB,wz,wOpac,wC)
+        line_3d_opaq(wXB,wYA-wYOvfl,wz,wXB,wYB+wYOvfl,wz,wOpac,wC)
+    line_3d_opaq(wXB,wYB,wZA-wZOvfl,wXB,wYB,wZB+wZOvfl,wOpac,wC)
 
 
 def draw3dGraph(f3d,xRange,yRange,zRange,steps):
@@ -172,16 +178,16 @@ def draw3dGraph(f3d,xRange,yRange,zRange,steps):
             xVal,yVal,zVal=xVals[xInd],yVals[yInd],zVals[xInd][yInd]
             # todo: do not draw again if we only want to display the text
             drawValues(steps,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist)
-            draw_string("x="+str(xVal),0,0,(180,0,0),bgC)
-            draw_string("y="+str(yVal),0,20,(180,0,0),bgC)
-            draw_string("z="+str(zVal),0,200,(180,0,0),bgC)
+            draw_string("x="+str(xVal),0,0,ttC,bgC)
+            draw_string("y="+str(yVal),0,20,ttC,bgC)
+            draw_string("z="+str(zVal),0,200,ttC,bgC)
 
             px=wXDist*(xVal-xMin)/xDist+wXA
             py=wYDist*(yVal-yMin)/yDist+wYA
             pz=wZDist*(zVal-zMin)/zDist+wZA
-            line_3d_opaq(px,py,pz-5,px,py,pz+5,60,(255,0,0))
-            line_3d_opaq(px-5,py,pz,px+5,py,pz,60,(255,0,0))
-            line_3d_opaq(px,py-5,pz,px,py+5,pz,60,(255,0,0))
+            line_3d_opaq(px,py,pz-5,px,py,pz+5,tOpac,tC)
+            line_3d_opaq(px-5,py,pz,px+5,py,pz,tOpac,tC)
+            line_3d_opaq(px,py-5,pz,px,py+5,pz,tOpac,tC)
 
             redraw=False
         if keydown(KEY_LEFT):
@@ -221,7 +227,9 @@ draw3dGraph(
     # (-3,3),(-3,3),(-2,2),15
     # lambda x,y: -x*x-y*y,
     # (-3,3),(-3,3),(-20,0),11
-    lambda x,y: -5*sin(y-x)-10*cos(x),
-    (-5,5),(-5,5),(-20,20),15
+    # lambda x,y: -5*sin(y-x)-10*cos(x),
+    # (-5,5),(-5,5),(-20,20),15
+    lambda x,y: cos(sqrt(x*x+y*y)),
+    (-3*pi,3*pi),(-3*pi,3*pi),(-6,6),23
 )
 
