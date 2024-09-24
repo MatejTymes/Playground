@@ -183,89 +183,128 @@ def calulateValues(f3d,xVals,yVals,zVals,steps,xDist,yDist,xMin,yMin):
             zVals[xInd][yInd]=z
     return (zLow,zHigh)
 
+def hanleKeyPress(pressedKeys,keyToCheck):
+    if pressedKeys[keyToCheck]:
+        pressedKeys[keyToCheck]=False
+        return True
+    return False
 
 def draw3dGraph(f3d,xRange,yRange,zRange,steps):
     xVals=[0]*(steps+2)
     yVals=[0]*(steps+2)
     zVals=[[0]*(steps+2) for k in range(steps+2)]
 
-
-    # calculate the values
+    # prepare values
     xMin,xMax=xRange[0],xRange[1]
     yMin,yMax=yRange[0],yRange[1]
+    zMin,zMax=-1,1
+    xDist,yDis,zDist=xMax-xMin,yMax-yMin,zMax-zMin
+    xInd,yInd=0,0
 
-    xDist,yDist=xMax-xMin,yMax-yMin
-    zOut = calulateValues(f3d,xVals,yVals,zVals,steps,xDist,yDist,xMin,yMin)
-
-    zMin,zMax=zOut[0],zOut[1]
-    if zRange!="auto":
-        zMin,zMax=zRange[0],zRange[1]
-    if zMin==zMax:
-        zMin-=1
-        zMax+=1
-    zDist=zMax-zMin
-
-
-    drawValues(steps,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist)
-
-    xInd,yInd=int(len(xVals)/2),int(len(yVals)/2)
-
-    waitingForKey=True
-    leftPressed,rightPressed,upPressed,downPressed=False,False,False,False
-    while waitingForKey:
-        if keydown(KEY_OK) or keydown(KEY_EXE):
-            waitingForKey=False
-        if keydown(KEY_LEFT):
-            leftPressed=True
-            waitingForKey=False
-        if keydown(KEY_RIGHT):
-            rightPressed=True
-            waitingForKey=False
-        if keydown(KEY_UP):
-            upPressed=True
-            waitingForKey=False
-        if keydown(KEY_DOWN):
-            downPressed=True
-            waitingForKey=False
-    drawTracer(xInd,yInd,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist)
-
-    redraw=False
+    mode="move"
+    recalculateValues,redrawGraph=True,True
+    redrawTracer=False
+    # okHeld,exeHeld,leftHeld,rightHeld,upHeld,downHeld=False,False,False,False,False,False
+    pressed={KEY_OK:False,KEY_EXE:False,KEY_LEFT:False,KEY_RIGHT:False,KEY_UP:False,KEY_DOWN:False,KEY_PLUS:False,KEY_MINUS:False}
+    handlePress={KEY_OK:False,KEY_EXE:False,KEY_LEFT:False,KEY_RIGHT:False,KEY_UP:False,KEY_DOWN:False,KEY_PLUS:False,KEY_MINUS:False}
     while True:
-        if redraw==True:
+        if recalculateValues:
+            xDist,yDist=xMax-xMin,yMax-yMin
+            zOut = calulateValues(f3d,xVals,yVals,zVals,steps,xDist,yDist,xMin,yMin)
+            zMin,zMax=zOut[0],zOut[1]
+            if zRange!="auto":
+                zMin,zMax=zRange[0],zRange[1]
+            if zMin==zMax:
+                zMin-=1
+                zMax+=1
+            zDist=zMax-zMin
+            xInd,yInd=int(len(xVals)/2),int(len(yVals)/2)
+            recalculateValues=False
+        if redrawGraph:
             drawValues(steps,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist)
+            # todo: draw mode info (trace vs move)
+            redrawGraph=False
+        if redrawTracer:
             drawTracer(xInd,yInd,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist)
+            redrawTracer=False
 
-            redraw=False
-        if keydown(KEY_LEFT):
-            if not leftPressed and xInd>0:
-                leftPressed=True
+        for key, alreadyPressed in pressed.items():
+            if keydown(key):
+                if not alreadyPressed:
+                    pressed[key]=True
+                    handlePress[key]=True
+            else:
+                if alreadyPressed:
+                    pressed[key]=False
+
+        if hanleKeyPress(handlePress,KEY_OK) or hanleKeyPress(handlePress,KEY_EXE):
+            if mode=="move":
+                mode="trace"
+                redrawTracer=True
+            else:
+                mode="move"
+                redrawGraph=True
+            handlePress[KEY_LEFT]=False
+            handlePress[KEY_RIGHT]=False
+            handlePress[KEY_UP]=False
+            handlePress[KEY_DOWN]=False
+            handlePress[KEY_PLUS]=False
+            handlePress[KEY_MINUS]=False
+        if mode=="trace":
+            if hanleKeyPress(handlePress,KEY_LEFT) and xInd>0:
                 xInd-=1
-                redraw=True
-        else:
-            leftPressed=False
-        if keydown(KEY_RIGHT):
-            if not rightPressed and xInd+1<len(xVals):
-                rightPressed=True
+                redrawGraph=True
+                redrawTracer=True
+            if hanleKeyPress(handlePress,KEY_RIGHT) and xInd+1<len(xVals):
                 xInd+=1
-                redraw=True
-        else:
-            rightPressed=False
-        if keydown(KEY_UP):
-            if not upPressed and yInd>0:
-                upPressed=True
+                redrawGraph=True
+                redrawTracer=True
+            if hanleKeyPress(handlePress,KEY_UP) and yInd>0:
                 yInd-=1
-                redraw=True
-        else:
-            upPressed=False
-        if keydown(KEY_DOWN):
-            if not downPressed and yInd+1<len(yVals):
-                downPressed=True
+                redrawGraph=True
+                redrawTracer=True
+            if hanleKeyPress(handlePress,KEY_DOWN) and yInd+1<len(yVals):
                 yInd+=1
-                redraw=True
-        else:
-            downPressed=False
+                redrawGraph=True
+                redrawTracer=True
+        elif mode=="move":
+            if hanleKeyPress(handlePress,KEY_LEFT):
+                xMin-=xDist/8
+                xMax-=xDist/8
+                recalculateValues=True
+                redrawGraph=True
+            if hanleKeyPress(handlePress,KEY_RIGHT):
+                xMin+=xDist/8
+                xMax+=xDist/8
+                recalculateValues=True
+                redrawGraph=True
+            if hanleKeyPress(handlePress,KEY_UP):
+                yMin-=yDist/8
+                yMax-=yDist/8
+                recalculateValues=True
+                redrawGraph=True
+            if hanleKeyPress(handlePress,KEY_DOWN):
+                yMin+=yDist/8
+                yMax+=yDist/8
+                recalculateValues=True
+                redrawGraph=True
+        if hanleKeyPress(handlePress,KEY_PLUS):
+            xMin+=xDist/4
+            xMax-=xDist/4
+            yMin+=yDist/4
+            yMax-=yDist/4
+            recalculateValues=True
+            redrawGraph=True
+            mode="move"
+        if hanleKeyPress(handlePress,KEY_MINUS):
+            xMin-=xDist/2
+            xMax+=xDist/2
+            yMin-=yDist/2
+            yMax+=yDist/2
+            recalculateValues=True
+            redrawGraph=True
+            mode="move"
 
-# todo: add - zoomIn (+), zoomOut (-) add switching between trace and move mode
 draw3dGraph(
     # lambda x,y: sin(y-x)+cos(x)+cos(y),
     # (-3,3),(-3,3),(-3,3),15
@@ -276,7 +315,7 @@ draw3dGraph(
     # lambda x,y: -5*sin(y-x)-10*cos(x),
     # (-5,5),(-5,5),"auto",15
     lambda x,y: (x*x*sin(x))+(y*y*sin(y)),
-    (-pi*2,pi*2),(-pi*2,pi*2),"auto",23
+    (-6,6),(-6,6),"auto",23
     # lambda x,y: cos(sqrt(x*x+y*y)),
     # (-3*pi,3*pi),(-3*pi,3*pi),(-6,6),23
 )
