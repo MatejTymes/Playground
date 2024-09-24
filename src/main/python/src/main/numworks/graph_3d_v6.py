@@ -40,13 +40,13 @@ try:
 except:
     pass
 
-sq2 = sqrt(2)
+iSq2=1/sqrt(2)
 
 def line_3d(x1,y1,z1,x2,y2,z2,c):
-    rx1=(x1-y1)/sq2+cx
-    rx2=(x2-y2)/sq2+cx
-    ry1=(y1+x1)/sq2/2.5+cy-z1
-    ry2=(y2+x2)/sq2/2.5+cy-z2
+    rx1=(x1-y1)*iSq2+cx
+    rx2=(x2-y2)*iSq2+cx
+    ry1=(y1+x1)*iSq2*0.4+cy-z1
+    ry2=(y2+x2)*iSq2*0.4+cy-z2
     line(int(rx1),int(ry1),int(rx2),int(ry2),c)
     # sleep(0.03)
 
@@ -60,9 +60,9 @@ def line_opaq(x1,y1,x2,y2,opac,c):
             px,py=x1+i,y1+int(d*i+0.5)
             oc=get_pixel(px,py)
             nc=(
-                ((oc[0]*rOpac)+(c[0]*opac))/100,
-                ((oc[1]*rOpac)+(c[1]*opac))/100,
-                ((oc[2]*rOpac)+(c[2]*opac))/100
+                ((oc[0]*rOpac)+(c[0]*opac))*0.01,
+                ((oc[1]*rOpac)+(c[1]*opac))*0.01,
+                ((oc[2]*rOpac)+(c[2]*opac))*0.01
             )
             set_pixel(px,py,nc)
     else:
@@ -71,17 +71,17 @@ def line_opaq(x1,y1,x2,y2,opac,c):
             px,py=x1+int(d*i+0.5),y1+i
             oc=get_pixel(px,py)
             nc=(
-                ((oc[0]*rOpac)+(c[0]*opac))/100,
-                ((oc[1]*rOpac)+(c[1]*opac))/100,
-                ((oc[2]*rOpac)+(c[2]*opac))/100
+                ((oc[0]*rOpac)+(c[0]*opac))*0.01,
+                ((oc[1]*rOpac)+(c[1]*opac))*0.01,
+                ((oc[2]*rOpac)+(c[2]*opac))*0.01
             )
             set_pixel(px,py,nc)
 
 def line_3d_opaq(x1,y1,z1,x2,y2,z2,opac,c):
-    rx1=(x1-y1)/sq2+cx
-    rx2=(x2-y2)/sq2+cx
-    ry1=(y1+x1)/sq2/2.5+cy-z1
-    ry2=(y2+x2)/sq2/2.5+cy-z2
+    rx1=(x1-y1)*iSq2+cx
+    rx2=(x2-y2)*iSq2+cx
+    ry1=(y1+x1)*iSq2*0.4+cy-z1
+    ry2=(y2+x2)*iSq2*0.4+cy-z2
     line_opaq(int(rx1),int(ry1),int(rx2),int(ry2),opac,c)
     # sleep(0.03)
 
@@ -95,6 +95,11 @@ def drawValues(steps,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist):
     for (wx,wy) in [(wXA,wYA),(wXA,wYB),(wXB,wYA)]:
         line_3d_opaq(wx,wy,wZA-wZOvfl,wx,wy,wZB+wZOvfl,wOpac,wC)
 
+    iXDist=1/xDist
+    iYDist=1/yDist
+    iZDist=1/zDist
+    iSPls1=1/(steps+1)
+
     # draw wireframe - new approach
     for ind in range(steps+1):
         xInd,yInd=0,ind
@@ -105,13 +110,13 @@ def drawValues(steps,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist):
             zValAB=zVals[xInd][yInd+1]
             zValBA=zVals[xInd+1][yInd]
 
-            pxA=wXDist*(xValA-xMin)/xDist+wXA
-            pxB=wXDist*(xValB-xMin)/xDist+wXA
-            pyA=wYDist*(yValA-yMin)/yDist+wYA
-            pyB=wYDist*(yValB-yMin)/yDist+wYA
-            pzAA=wZDist*(zValAA-zMin)/zDist+wZA
-            pzAB=wZDist*(zValAB-zMin)/zDist+wZA
-            pzBA=wZDist*(zValBA-zMin)/zDist+wZA
+            pxA=wXDist*(xValA-xMin)*iXDist+wXA
+            pxB=wXDist*(xValB-xMin)*iXDist+wXA
+            pyA=wYDist*(yValA-yMin)*iYDist+wYA
+            pyB=wYDist*(yValB-yMin)*iYDist+wYA
+            pzAA=wZDist*(zValAA-zMin)*iZDist+wZA
+            pzAB=wZDist*(zValAB-zMin)*iZDist+wZA
+            pzBA=wZDist*(zValBA-zMin)*iZDist+wZA
 
             line_3d(pxA,pyA,pzAA,pxA,pyB,pzAB,ylC)
             line_3d(pxA,pyA,pzAA,pxB,pyA,pzBA,xlC)
@@ -128,13 +133,13 @@ def drawValues(steps,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist):
             zValBA=zVals[xInd][yInd-1]
             zValBB=zVals[xInd][yInd]
 
-            pxA=wXDist*(xValA-xMin)/xDist+wXA
-            pxB=wXDist*(xValB-xMin)/xDist+wXA
-            pyA=wYDist*(yValA-yMin)/yDist+wYA
-            pyB=wYDist*(yValB-yMin)/yDist+wYA
-            pzAB=wZDist*(zValAB-zMin)/zDist+wZA
-            pzBA=wZDist*(zValBA-zMin)/zDist+wZA
-            pzBB=wZDist*(zValBB-zMin)/zDist+wZA
+            pxA=wXDist*(xValA-xMin)*iXDist+wXA
+            pxB=wXDist*(xValB-xMin)*iXDist+wXA
+            pyA=wYDist*(yValA-yMin)*iYDist+wYA
+            pyB=wYDist*(yValB-yMin)*iYDist+wYA
+            pzAB=wZDist*(zValAB-zMin)*iZDist+wZA
+            pzBA=wZDist*(zValBA-zMin)*iZDist+wZA
+            pzBB=wZDist*(zValBB-zMin)*iZDist+wZA
 
             line_3d(pxB,pyA,pzBA,pxB,pyB,pzBB,ylC)
             line_3d(pxA,pyB,pzAB,pxB,pyB,pzBB,xlC)
@@ -224,7 +229,7 @@ def draw3dGraph(f3d,xRange,yRange,zRange,steps):
                 zMin-=1
                 zMax+=1
             zDist=zMax-zMin
-            xInd,yInd=int(len(xVals)/2),int(len(yVals)/2)
+            xInd,yInd=int(len(xVals)*0.5),int(len(yVals)*0.5)
             recalculateValues=False
         if redrawGraph:
             drawValues(steps,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist)
