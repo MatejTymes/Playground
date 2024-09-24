@@ -18,6 +18,8 @@ xlC,ylC=(0,0,180),(0,180,0)
 tOpac=60
 tC=(255,0,0)
 ttC=(180,0,0)
+mC=(255,255,255)
+mBgC=(255,188,63)
 
 wXDist,wYDist,wZDist=wXB-wXA,wYB-wYA,wZB-wZA
 
@@ -189,6 +191,10 @@ def hanleKeyPress(pressedKeys,keyToCheck):
         return True
     return False
 
+def drawModeIcon(mode):
+    modeString="m" if mode=="move" else ("t" if mode=="trace" else "?")
+    draw_string(modeString,305,5,mC,mBgC)
+
 def draw3dGraph(f3d,xRange,yRange,zRange,steps):
     xVals=[0]*(steps+2)
     yVals=[0]*(steps+2)
@@ -222,7 +228,7 @@ def draw3dGraph(f3d,xRange,yRange,zRange,steps):
             recalculateValues=False
         if redrawGraph:
             drawValues(steps,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist)
-            # todo: draw mode info (trace vs move)
+            drawModeIcon(mode)
             redrawGraph=False
         if redrawTracer:
             drawTracer(xInd,yInd,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist)
@@ -240,6 +246,7 @@ def draw3dGraph(f3d,xRange,yRange,zRange,steps):
         if hanleKeyPress(handlePress,KEY_OK) or hanleKeyPress(handlePress,KEY_EXE):
             if mode=="move":
                 mode="trace"
+                drawModeIcon(mode)
                 redrawTracer=True
             else:
                 mode="move"
