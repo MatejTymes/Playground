@@ -159,18 +159,9 @@ def drawTracer(xInd,yInd,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist):
     line_3d_opaq(px-5,py,pz,px+5,py,pz,tOpac,tC)
     line_3d_opaq(px,py-5,pz,px,py+5,pz,tOpac,tC)
 
-
-
-def draw3dGraph(f3d,xRange,yRange,zRange,steps):
-    xMin,xMax=xRange[0],xRange[1]
-    yMin,yMax=yRange[0],yRange[1]
-    zMin,zMax=zRange[0],zRange[1]
-
-    # calculate the values
-    xDist,yDist,zDist=xMax-xMin,yMax-yMin,zMax-zMin
-    xVals=[0]*(steps+2)
-    yVals=[0]*(steps+2)
-    zVals=[[0]*(steps+2) for k in range(steps+2)]
+def calulateValues(f3d,xVals,yVals,zVals,steps,xDist,yDist,xMin,yMin):
+    zHigh,zLow=0,0
+    firstValue=False
     for s in range(steps+2):
         xVals[s]=s*xDist/(steps+1)+xMin
         yVals[s]=s*yDist/(steps+1)+yMin
@@ -178,7 +169,39 @@ def draw3dGraph(f3d,xRange,yRange,zRange,steps):
         xVal=xVals[xInd]
         for yInd in range(steps+2):
             yVal=yVals[yInd]
-            zVals[xInd][yInd]=f3d(xVal,yVal)
+            z=f3d(xVal,yVal)
+            if firstValue:
+                zHigh=z
+                zLow=z
+                firstValue=False
+            else:
+                if z<zLow:
+                    zLow=z
+                else:
+                    if z>zHigh:
+                        zHigh=z
+            zVals[xInd][yInd]=z
+    return (zLow,zHigh)
+
+
+def draw3dGraph(f3d,xRange,yRange,zRange,steps):
+    xMin,xMax=xRange[0],xRange[1]
+    yMin,yMax=yRange[0],yRange[1]
+
+    # calculate the values
+    xVals=[0]*(steps+2)
+    yVals=[0]*(steps+2)
+    zVals=[[0]*(steps+2) for k in range(steps+2)]
+    xDist,yDist=xMax-xMin,yMax-yMin
+    zOut = calulateValues(f3d,xVals,yVals,zVals,steps,xDist,yDist,xMin,yMin)
+    zMin,zMax=zOut[0],zOut[1]
+    if zRange!="auto":
+        zMin,zMax=zRange[0],zRange[1]
+    if zMin==zMax:
+        zMin-=1
+        zMax+=1
+    zDist=zMax-zMin
+
 
     drawValues(steps,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist)
 
@@ -240,17 +263,17 @@ def draw3dGraph(f3d,xRange,yRange,zRange,steps):
         else:
             downPressed=False
 
-
+# todo: add - zoomIn (+), zoomOut (-) add switching between trace and move mode
 draw3dGraph(
     # lambda x,y: sin(y-x)+cos(x)+cos(y),
     # (-3,3),(-3,3),(-3,3),15
     # lambda x,y: sin(y-x)+cos(x),
-    # (-3,3),(-3,3),(-2,2),15
+    # (-3,3),(-3,3),"auto",15
     # lambda x,y: -x*x-y*y,
-    # (-3,3),(-3,3),(-20,0),11
-    # lambda x,y: -5*sin(y-x)-10*cos(x),
-    # (-5,5),(-5,5),(-20,20),15
-    lambda x,y: cos(sqrt(x*x+y*y)),
-    (-3*pi,3*pi),(-3*pi,3*pi),(-6,6),23
+    # (-3,3),(-3,3),"auto",11
+    lambda x,y: -5*sin(y-x)-10*cos(x),
+    (-5,5),(-5,5),"auto",15
+    # lambda x,y: cos(sqrt(x*x+y*y)),
+    # (-3*pi,3*pi),(-3*pi,3*pi),(-6,6),23
 )
 
