@@ -101,6 +101,11 @@ def drawValues(steps,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist):
     iZDist=1/zDist
     iSPls1=1/(steps+1)
 
+    # indSqP=[0]*(steps+2)
+    # for ind in range(steps+2):
+    #     indP=ind*iSPls1
+    #     indSqP[ind]=indP*indP
+
     # draw wireframe - new approach
     for ind in range(steps+1):
         xInd,yInd=0,ind
@@ -119,6 +124,7 @@ def drawValues(steps,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist):
             pzAB=wZDist*(zValAB-zMin)*iZDist+wZA
             pzBA=wZDist*(zValBA-zMin)*iZDist+wZA
 
+            # p=sqrt(indSqP[xInd]+indSqP[yInd])*iSq2
             xIndP=xInd*iSPls1
             yIndP=yInd*iSPls1
             p=sqrt(xIndP*xIndP+yIndP*yIndP)*iSq2
@@ -148,9 +154,7 @@ def drawValues(steps,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist):
             pzBA=wZDist*(zValBA-zMin)*iZDist+wZA
             pzBB=wZDist*(zValBB-zMin)*iZDist+wZA
 
-            xIndP=xInd*iSPls1
-            yIndP=yInd*iSPls1
-            p=sqrt(xIndP*xIndP+yIndP*yIndP)*iSq2
+            p=sqrt(indSqP[xInd]+indSqP[yInd])*iSq2
             xlC=(xlMaxC[0]*p+xlMinC[0]*(1-p), xlMaxC[1]*p+xlMinC[1]*(1-p), xlMaxC[2]*p+xlMinC[2]*(1-p))
             ylC=(ylMaxC[0]*p+ylMinC[0]*(1-p), ylMaxC[1]*p+ylMinC[1]*(1-p), ylMaxC[2]*p+ylMinC[2]*(1-p))
 
