@@ -7,9 +7,9 @@ from ion import *
 cx,cy=320/2,220/2
 
 # 3d wireframe edges
-wXA,wXB,wXOvfl=-100,100,15
-wYA,wYB,wYOvfl=-100,100,15
-wZA,wZB,wZOvfl=-40,40,10
+wXA,wXB,wXOvfl=-105,105,10
+wYA,wYB,wYOvfl=-105,105,10
+wZA,wZB,wZOvfl=-40,40,7
 
 bgC=(240,255,220)
 wOpac=20
@@ -21,6 +21,8 @@ tC=(255,0,0)
 ttC=(180,0,0)
 mC=(255,255,255)
 mBgC=(255,188,63)
+ax,ay,aOpac=225,55,60
+rot=0
 
 wXDist,wYDist,wZDist=wXB-wXA,wYB-wYA,wZB-wZA
 
@@ -101,11 +103,6 @@ def drawValues(steps,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist):
     iZDist=1/zDist
     iSPls1=1/(steps+1)
 
-    # indSqP=[0]*(steps+2)
-    # for ind in range(steps+2):
-    #     indP=ind*iSPls1
-    #     indSqP[ind]=indP*indP
-
     # draw wireframe - new approach
     for ind in range(steps+1):
         xInd,yInd=0,ind
@@ -124,7 +121,6 @@ def drawValues(steps,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist):
             pzAB=wZDist*(zValAB-zMin)*iZDist+wZA
             pzBA=wZDist*(zValBA-zMin)*iZDist+wZA
 
-            # p=sqrt(indSqP[xInd]+indSqP[yInd])*iSq2
             xIndP=xInd*iSPls1
             yIndP=yInd*iSPls1
             p=sqrt(xIndP*xIndP+yIndP*yIndP)*iSq2
@@ -154,7 +150,6 @@ def drawValues(steps,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist):
             pzBA=wZDist*(zValBA-zMin)*iZDist+wZA
             pzBB=wZDist*(zValBB-zMin)*iZDist+wZA
 
-            # p=sqrt(indSqP[xInd]+indSqP[yInd])*iSq2
             xIndP=xInd*iSPls1
             yIndP=yInd*iSPls1
             p=sqrt(xIndP*xIndP+yIndP*yIndP)*iSq2
@@ -172,6 +167,30 @@ def drawValues(steps,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist):
         line_3d_opaq(wXA-wXOvfl,wYB,wz,wXB+wXOvfl,wYB,wz,wOpac,wC)
         line_3d_opaq(wXB,wYA-wYOvfl,wz,wXB,wYB+wYOvfl,wz,wOpac,wC)
     line_3d_opaq(wXB,wYB,wZA-wZOvfl,wXB,wYB,wZB+wZOvfl,wOpac,wC)
+
+    # rotation arrows
+    if rot==0 or rot==90:
+        axMin,axMax=-10,35
+    else:
+        axMin,axMax=10,-35
+    if rot==0 or rot==270:
+        ayMin,ayMax=-10,35
+    else:
+        ayMin,ayMax=10,-35
+    if rot==0 or rot==180:
+        axC,ayC=xlMinC,ylMinC
+    else:
+        axC,ayC=ylMinC,xlMinC
+    line_3d_opaq(ax+axMin,ay,0,ax+axMax,ay,0,aOpac,axC)
+    line_3d_opaq(ax,ay+ayMin,0,ax,ay+ayMax,0,aOpac,ayC)
+
+    line_3d_opaq(ax+axMax*2/3,ay-5,0,ax+axMax*2/3,ay+5,0,aOpac,axC)
+    line_3d_opaq(ax+axMax*2/3,ay-5,0,ax+axMax,ay,0,aOpac,axC)
+    line_3d_opaq(ax+axMax*2/3,ay+5,0,ax+axMax,ay,0,aOpac,axC)
+
+    line_3d_opaq(ax-5,ay+ayMax*2/3,0,ax+5,ay+ayMax*2/3,0,aOpac,ayC)
+    line_3d_opaq(ax-5,ay+ayMax*2/3,0,ax,ay+ayMax,0,aOpac,ayC)
+    line_3d_opaq(ax+5,ay+ayMax*2/3,0,ax,ay+ayMax,0,aOpac,ayC)
 
 def drawTracer(xInd,yInd,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist):
     xVal,yVal,zVal=xVals[xInd],yVals[yInd],zVals[xInd][yInd]
@@ -217,15 +236,19 @@ def hanleKeyPress(pressedKeys,keyToCheck):
     return False
 
 def drawModeIcon(mode):
-    modeString="m" if mode=="move" else ("t" if mode=="trace" else "?")
+    modeString="?"
+    if mode=="move":
+        modeString="m"
+    elif mode=="trace":
+        modeString="t"
     draw_string(modeString,305,5,mC,mBgC)
 
 def draw3dGraph(f3d,xRange,yRange,zRange,steps):
+    global rot
     xVals=[0]*(steps+2)
     yVals=[0]*(steps+2)
     zVals=[[0]*(steps+2) for k in range(steps+2)]
 
-    # prepare values
     xMin,xMax=xRange[0],xRange[1]
     yMin,yMax=yRange[0],yRange[1]
     zMin,zMax=-1,1
@@ -235,9 +258,8 @@ def draw3dGraph(f3d,xRange,yRange,zRange,steps):
     mode="move"
     recalculateValues,redrawGraph=True,True
     redrawTracer=False
-    # okHeld,exeHeld,leftHeld,rightHeld,upHeld,downHeld=False,False,False,False,False,False
-    pressed={KEY_OK:False,KEY_EXE:False,KEY_LEFT:False,KEY_RIGHT:False,KEY_UP:False,KEY_DOWN:False,KEY_PLUS:False,KEY_MINUS:False}
-    handlePress={KEY_OK:False,KEY_EXE:False,KEY_LEFT:False,KEY_RIGHT:False,KEY_UP:False,KEY_DOWN:False,KEY_PLUS:False,KEY_MINUS:False}
+    pressed={KEY_OK:False,KEY_EXE:False,KEY_LEFT:False,KEY_RIGHT:False,KEY_UP:False,KEY_DOWN:False,KEY_PLUS:False,KEY_MINUS:False,KEY_LEFTPARENTHESIS:False,KEY_RIGHTPARENTHESIS:False}
+    handlePress={KEY_OK:False,KEY_EXE:False,KEY_LEFT:False,KEY_RIGHT:False,KEY_UP:False,KEY_DOWN:False,KEY_PLUS:False,KEY_MINUS:False,KEY_LEFTPARENTHESIS:False,KEY_RIGHTPARENTHESIS:False}
     while True:
         if recalculateValues:
             xDist,yDist=xMax-xMin,yMax-yMin
@@ -254,6 +276,8 @@ def draw3dGraph(f3d,xRange,yRange,zRange,steps):
         if redrawGraph:
             drawValues(steps,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist)
             drawModeIcon(mode)
+            if mode=="trace":
+                redrawTracer=True
             redrawGraph=False
         if redrawTracer:
             drawTracer(xInd,yInd,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist)
@@ -282,6 +306,8 @@ def draw3dGraph(f3d,xRange,yRange,zRange,steps):
             handlePress[KEY_DOWN]=False
             handlePress[KEY_PLUS]=False
             handlePress[KEY_MINUS]=False
+            handlePress[KEY_LEFTPARENTHESIS]=False
+            handlePress[KEY_RIGHTPARENTHESIS]=False
         if mode=="trace":
             if hanleKeyPress(handlePress,KEY_LEFT) and xInd>0:
                 xInd-=1
@@ -327,7 +353,6 @@ def draw3dGraph(f3d,xRange,yRange,zRange,steps):
             yMax-=yDist/4
             recalculateValues=True
             redrawGraph=True
-            mode="move"
         if hanleKeyPress(handlePress,KEY_MINUS):
             xMin-=xDist/2
             xMax+=xDist/2
@@ -335,7 +360,16 @@ def draw3dGraph(f3d,xRange,yRange,zRange,steps):
             yMax+=yDist/2
             recalculateValues=True
             redrawGraph=True
-            mode="move"
+        if hanleKeyPress(handlePress,KEY_LEFTPARENTHESIS):
+            rot-=90
+            if rot<0:
+                rot+=360
+            redrawGraph=True
+        if hanleKeyPress(handlePress,KEY_RIGHTPARENTHESIS):
+            rot+=90
+            if rot>=360:
+                rot-=360
+            redrawGraph=True
 
 draw3dGraph(
     # lambda x,y: sin(y-x)+cos(x)+cos(y),
@@ -353,4 +387,3 @@ draw3dGraph(
     # lambda x,y: 0,
     # (-6,6),(-6,6),"auto",23
 )
-
