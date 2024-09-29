@@ -55,7 +55,7 @@ def sinCos(rot):
 def rotX(x,y):
     return int(x*cosRad-y*sinRad)
 def rotY(x,y,z):
-    return int((x*sinRad+y*cosRad)*0.4-z)
+    return int((x*sinRad+y*cosRad)*0.45-z)
 def line_3d(x1,y1,z1,x2,y2,z2,c,cpX=cx,cpY=cy):
     rx1=rotX(x1,y1)+cpX
     rx2=rotX(x2,y2)+cpX
@@ -185,28 +185,15 @@ def drawValues(steps,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist):
     line_3d_opaq(wXB,wYB,wZA-wZOvfl,wXB,wYB,wZB+wZOvfl,wOpac,wC)
 
     # rotation arrows
-    if rot==315 or rot==45:
-        axMin,axMax=-10,35
-    else:
-        axMin,axMax=10,-35
-    if rot==315 or rot==225:
-        ayMin,ayMax=-10,35
-    else:
-        ayMin,ayMax=10,-35
-    if rot==315 or rot==135:
-        axC,ayC=xlMinC,ylMinC
-    else:
-        axC,ayC=ylMinC,xlMinC
-    line_3d_opaq(axMin,0,0,axMax,0,0,aOpac,axC,acX,acY)
-    line_3d_opaq(0,ayMin,0,0,ayMax,0,aOpac,ayC,acX,acY)
+    line_3d_opaq(-10,0,0,35,0,0,aOpac,xlMinC,acX,acY)
+    line_3d_opaq(23,-5,0,35,0,0,aOpac,xlMinC,acX,acY)
+    line_3d_opaq(23,5,0,35,0,0,aOpac,xlMinC,acX,acY)
+    line_3d_opaq(23,-5,0,23,5,0,aOpac,xlMinC,acX,acY)
 
-    line_3d_opaq(axMax*2/3,-5,0,axMax*2/3,5,0,aOpac,axC,acX,acY)
-    line_3d_opaq(axMax*2/3,-5,0,axMax,0,0,aOpac,axC,acX,acY)
-    line_3d_opaq(axMax*2/3,5,0,axMax,0,0,aOpac,axC,acX,acY)
-
-    line_3d_opaq(-5,ayMax*2/3,0,5,ayMax*2/3,0,aOpac,ayC,acX,acY)
-    line_3d_opaq(-5,ayMax*2/3,0,0,ayMax,0,aOpac,ayC,acX,acY)
-    line_3d_opaq(5,ayMax*2/3,0,0,ayMax,0,aOpac,ayC,acX,acY)
+    line_3d_opaq(0,-10,0,0,35,0,aOpac,ylMinC,acX,acY)
+    line_3d_opaq(-5,23,0,0,35,0,aOpac,ylMinC,acX,acY)
+    line_3d_opaq(5,23,0,0,35,0,aOpac,ylMinC,acX,acY)
+    line_3d_opaq(-5,23,0,5,23,0,aOpac,ylMinC,acX,acY)
 
 def drawTracer(xInd,yInd,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist):
     xVal,yVal,zVal=xVals[xInd],yVals[yInd],zVals[xInd][yInd]
