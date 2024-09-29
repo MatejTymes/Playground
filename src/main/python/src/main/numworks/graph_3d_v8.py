@@ -4,7 +4,7 @@ from ion import *
 # from time import sleep
 
 # center points
-cx,cy=320/2,220/2
+cx,cy=int(320/2),int(220/2)
 
 # 3d wireframe edges
 wXA,wXB,wXOvfl=-105,105,10
@@ -21,8 +21,12 @@ tC=(255,0,0)
 ttC=(180,0,0)
 mC=(255,255,255)
 mBgC=(255,188,63)
-ax,ay,aOpac=225,55,60
+acX,acY,aOpac=280,189,60
+
 rot=315
+rad=(-rot)*pi/180
+sinRad=sin(rad)
+cosRad=cos(rad)
 
 wXDist,wYDist,wZDist=wXB-wXA,wYB-wYA,wZB-wZA
 
@@ -45,11 +49,18 @@ except:
 
 iSq2=1/sqrt(2)
 
-def line_3d(x1,y1,z1,x2,y2,z2,c):
-    rx1=(x1-y1)*iSq2+cx
-    rx2=(x2-y2)*iSq2+cx
-    ry1=(y1+x1)*iSq2*0.4+cy-z1
-    ry2=(y2+x2)*iSq2*0.4+cy-z2
+def sinCos(rot):
+    rad=-rot*pi/180
+    return (sin(rad),cos(rad))
+def rotX(x,y):
+    return int(x*cosRad-y*sinRad)
+def rotY(x,y,z):
+    return int((x*sinRad+y*cosRad)*0.4-z)
+def line_3d(x1,y1,z1,x2,y2,z2,c,cpX=cx,cpY=cy):
+    rx1=rotX(x1,y1)+cpX
+    rx2=rotX(x2,y2)+cpX
+    ry1=rotY(x1,y1,z1)+cpY
+    ry2=rotY(x2,y2,z2)+cpY
     line(int(rx1),int(ry1),int(rx2),int(ry2),c)
     # sleep(0.03)
 
@@ -80,11 +91,11 @@ def line_opaq(x1,y1,x2,y2,opac,c):
             )
             set_pixel(px,py,nc)
 
-def line_3d_opaq(x1,y1,z1,x2,y2,z2,opac,c):
-    rx1=(x1-y1)*iSq2+cx
-    rx2=(x2-y2)*iSq2+cx
-    ry1=(y1+x1)*iSq2*0.4+cy-z1
-    ry2=(y2+x2)*iSq2*0.4+cy-z2
+def line_3d_opaq(x1,y1,z1,x2,y2,z2,opac,c,cpX=cx,cpY=cy):
+    rx1=rotX(x1,y1)+cpX
+    rx2=rotX(x2,y2)+cpX
+    ry1=rotY(x1,y1,z1)+cpY
+    ry2=rotY(x2,y2,z2)+cpY
     line_opaq(int(rx1),int(ry1),int(rx2),int(ry2),opac,c)
     # sleep(0.03)
 
@@ -186,16 +197,16 @@ def drawValues(steps,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist):
         axC,ayC=xlMinC,ylMinC
     else:
         axC,ayC=ylMinC,xlMinC
-    line_3d_opaq(ax+axMin,ay,0,ax+axMax,ay,0,aOpac,axC)
-    line_3d_opaq(ax,ay+ayMin,0,ax,ay+ayMax,0,aOpac,ayC)
+    line_3d_opaq(axMin,0,0,axMax,0,0,aOpac,axC,acX,acY)
+    line_3d_opaq(0,ayMin,0,0,ayMax,0,aOpac,ayC,acX,acY)
 
-    line_3d_opaq(ax+axMax*2/3,ay-5,0,ax+axMax*2/3,ay+5,0,aOpac,axC)
-    line_3d_opaq(ax+axMax*2/3,ay-5,0,ax+axMax,ay,0,aOpac,axC)
-    line_3d_opaq(ax+axMax*2/3,ay+5,0,ax+axMax,ay,0,aOpac,axC)
+    line_3d_opaq(axMax*2/3,-5,0,axMax*2/3,5,0,aOpac,axC,acX,acY)
+    line_3d_opaq(axMax*2/3,-5,0,axMax,0,0,aOpac,axC,acX,acY)
+    line_3d_opaq(axMax*2/3,5,0,axMax,0,0,aOpac,axC,acX,acY)
 
-    line_3d_opaq(ax-5,ay+ayMax*2/3,0,ax+5,ay+ayMax*2/3,0,aOpac,ayC)
-    line_3d_opaq(ax-5,ay+ayMax*2/3,0,ax,ay+ayMax,0,aOpac,ayC)
-    line_3d_opaq(ax+5,ay+ayMax*2/3,0,ax,ay+ayMax,0,aOpac,ayC)
+    line_3d_opaq(-5,ayMax*2/3,0,5,ayMax*2/3,0,aOpac,ayC,acX,acY)
+    line_3d_opaq(-5,ayMax*2/3,0,0,ayMax,0,aOpac,ayC,acX,acY)
+    line_3d_opaq(5,ayMax*2/3,0,0,ayMax,0,aOpac,ayC,acX,acY)
 
 def drawTracer(xInd,yInd,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist):
     xVal,yVal,zVal=xVals[xInd],yVals[yInd],zVals[xInd][yInd]
