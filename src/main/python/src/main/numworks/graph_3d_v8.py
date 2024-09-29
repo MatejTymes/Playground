@@ -34,6 +34,8 @@ def line(x1,y1,x2,y2,c):
     w=x2-x1
     h=y2-y1
     if abs(w)>=abs(h):
+        if w==0:
+            return
         d=h/w
         for i in range(0,w,(w>0)*2-1):
             set_pixel(x1+i,y1+int(d*i+0.5),c)
@@ -49,13 +51,10 @@ except:
 
 iSq2=1/sqrt(2)
 
-def sinCos(rot):
-    rad=-rot*pi/180
-    return (sin(rad),cos(rad))
 def rotX(x,y):
     return int(x*cosRad-y*sinRad)
 def rotY(x,y,z):
-    return int((x*sinRad+y*cosRad)*0.45-z)
+    return int((x*sinRad+y*cosRad)*0.4-z)
 def line_3d(x1,y1,z1,x2,y2,z2,c,cpX=cx,cpY=cy):
     rx1=rotX(x1,y1)+cpX
     rx2=rotX(x2,y2)+cpX
@@ -99,11 +98,6 @@ def line_3d_opaq(x1,y1,z1,x2,y2,z2,opac,c,cpX=cx,cpY=cy):
     line_opaq(int(rx1),int(ry1),int(rx2),int(ry2),opac,c)
     # sleep(0.03)
 
-# rotate indexes
-def ri(xInd,yInd,rot,steps):
-    # todo: implement
-    return (xInd,yInd)
-
 def drawValues(steps,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist):
     fill_rect(0,0,320,220,bgC)
 
@@ -119,7 +113,7 @@ def drawValues(steps,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist):
     iZDist=1/zDist
     iSPls1=1/(steps+1)
 
-    # draw wireframe - new approach
+    # draw wireframe - todo: change line drawing order based on the rotation
     for ind in range(steps+1):
         xInd,yInd=0,ind
         while yInd>=0:
@@ -247,7 +241,7 @@ def drawModeIcon(mode):
     draw_string(modeString,305,5,mC,mBgC)
 
 def draw3dGraph(f3d,xRange,yRange,zRange,steps):
-    global rot
+    global rot,rad,sinRad,cosRad
     xVals=[0]*(steps+2)
     yVals=[0]*(steps+2)
     zVals=[[0]*(steps+2) for k in range(steps+2)]
@@ -300,7 +294,7 @@ def draw3dGraph(f3d,xRange,yRange,zRange,steps):
                 mode="trace"
                 drawModeIcon(mode)
                 redrawTracer=True
-            else:
+            elif mode=="trace":
                 mode="move"
                 redrawGraph=True
             handlePress[KEY_LEFT]=False
@@ -364,14 +358,20 @@ def draw3dGraph(f3d,xRange,yRange,zRange,steps):
             recalculateValues=True
             redrawGraph=True
         if hanleKeyPress(handlePress,KEY_LEFTPARENTHESIS):
-            rot-=90
+            rot-=30
             if rot<0:
                 rot+=360
+            rad=(-rot)*pi/180
+            sinRad=sin(rad)
+            cosRad=cos(rad)
             redrawGraph=True
         if hanleKeyPress(handlePress,KEY_RIGHTPARENTHESIS):
-            rot+=90
+            rot+=30
             if rot>=360:
                 rot-=360
+            rad=(-rot)*pi/180
+            sinRad=sin(rad)
+            cosRad=cos(rad)
             redrawGraph=True
 
 draw3dGraph(
