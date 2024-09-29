@@ -22,7 +22,7 @@ ttC=(180,0,0)
 mC=(255,255,255)
 mBgC=(255,188,63)
 ax,ay,aOpac=225,55,60
-rot=0
+rot=315
 
 wXDist,wYDist,wZDist=wXB-wXA,wYB-wYA,wZB-wZA
 
@@ -87,6 +87,11 @@ def line_3d_opaq(x1,y1,z1,x2,y2,z2,opac,c):
     ry2=(y2+x2)*iSq2*0.4+cy-z2
     line_opaq(int(rx1),int(ry1),int(rx2),int(ry2),opac,c)
     # sleep(0.03)
+
+# rotate indexes
+def ri(xInd,yInd,rot,steps):
+    # todo: implement
+    return (xInd,yInd)
 
 def drawValues(steps,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist):
     fill_rect(0,0,320,220,bgC)
@@ -169,15 +174,15 @@ def drawValues(steps,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist):
     line_3d_opaq(wXB,wYB,wZA-wZOvfl,wXB,wYB,wZB+wZOvfl,wOpac,wC)
 
     # rotation arrows
-    if rot==0 or rot==90:
+    if rot==315 or rot==45:
         axMin,axMax=-10,35
     else:
         axMin,axMax=10,-35
-    if rot==0 or rot==270:
+    if rot==315 or rot==225:
         ayMin,ayMax=-10,35
     else:
         ayMin,ayMax=10,-35
-    if rot==0 or rot==180:
+    if rot==315 or rot==135:
         axC,ayC=xlMinC,ylMinC
     else:
         axC,ayC=ylMinC,xlMinC
