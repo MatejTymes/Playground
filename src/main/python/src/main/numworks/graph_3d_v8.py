@@ -15,7 +15,7 @@ bgC=(240,255,220)
 wOpac=20
 wC=(0,0,0)
 xlMinC,xlMaxC=(50,0,140),(10,10,255)
-ylMinC,ylMaxC=(50,140,0),(10,255,10)
+ylMinC,ylMaxC=(50,140,0),(10,220,10)
 tOpac=60
 tC=(255,0,0)
 ttC=(180,0,0)
@@ -360,7 +360,7 @@ def draw3dGraph(f3d,xRange,yRange,zRange,steps):
             recalculateValues=True
             redrawGraph=True
         if hanleKeyPress(handlePress,KEY_LEFTPARENTHESIS):
-            rot-=30
+            rot-=15
             if rot<0:
                 rot+=360
             rad=(-rot)*pi/180
@@ -368,7 +368,7 @@ def draw3dGraph(f3d,xRange,yRange,zRange,steps):
             cosRad=cos(rad)
             redrawGraph=True
         if hanleKeyPress(handlePress,KEY_RIGHTPARENTHESIS):
-            rot+=30
+            rot+=15
             if rot>=360:
                 rot-=360
             rad=(-rot)*pi/180
