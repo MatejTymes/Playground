@@ -55,6 +55,16 @@ def rotX(x,y):
     return int(x*cosRad-y*sinRad)
 def rotY(x,y,z):
     return int((x*sinRad+y*cosRad)*0.4-z)
+def updateRotBy(rotInc):
+    global rot,rad,sinRad,cosRad
+    rot+=rotInc
+    if rot>=360:
+        rot-=360
+    elif rot<0:
+        rot+=360
+    rad=(-rot)*pi/180
+    sinRad=sin(rad)
+    cosRad=cos(rad)
 def line_3d(x1,y1,z1,x2,y2,z2,c,cpX=cx,cpY=cy):
     rx1=rotX(x1,y1)+cpX
     rx2=rotX(x2,y2)+cpX
@@ -243,7 +253,6 @@ def drawModeIcon(mode):
     draw_string(modeString,305,5,mC,mBgC)
 
 def draw3dGraph(f3d,xRange,yRange,zRange,steps):
-    global rot,rad,sinRad,cosRad
     xVals=[0]*(steps+2)
     yVals=[0]*(steps+2)
     zVals=[[0]*(steps+2) for k in range(steps+2)]
@@ -360,20 +369,10 @@ def draw3dGraph(f3d,xRange,yRange,zRange,steps):
             recalculateValues=True
             redrawGraph=True
         if hanleKeyPress(handlePress,KEY_LEFTPARENTHESIS):
-            rot-=15
-            if rot<0:
-                rot+=360
-            rad=(-rot)*pi/180
-            sinRad=sin(rad)
-            cosRad=cos(rad)
+            updateRotBy(-15)
             redrawGraph=True
         if hanleKeyPress(handlePress,KEY_RIGHTPARENTHESIS):
-            rot+=15
-            if rot>=360:
-                rot-=360
-            rad=(-rot)*pi/180
-            sinRad=sin(rad)
-            cosRad=cos(rad)
+            updateRotBy(15)
             redrawGraph=True
 
 draw3dGraph(
