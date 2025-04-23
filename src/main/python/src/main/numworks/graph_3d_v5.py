@@ -161,7 +161,7 @@ def drawTracer(xInd,yInd,xVals,yVals,zVals,xMin,yMin,zMin,xDist,yDist,zDist):
 
 def calulateValues(f3d,xVals,yVals,zVals,steps,xDist,yDist,xMin,yMin):
     zHigh,zLow=0,0
-    firstValue=False
+    firstValue=True
     for s in range(steps+2):
         xVals[s]=s*xDist/(steps+1)+xMin
         yVals[s]=s*yDist/(steps+1)+yMin
